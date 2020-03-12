@@ -77,6 +77,6 @@ class Function()
       largest = depth
     }
 
-    return largest
+    largest
   }
 }
