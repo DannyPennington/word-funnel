@@ -1,3 +1,4 @@
+import scala.collection.mutable.ArrayBuffer
 import scala.io.Source
 
 object Main extends App
@@ -9,6 +10,7 @@ object Main extends App
   }
 
   val words = readFile()
+  val wordExclusion = ArrayBuffer.empty[String]
 
   def funnel( word :String, index :Int=0 ) :Int =
   {
@@ -17,38 +19,46 @@ object Main extends App
     //var charsHold :Array[Char] = Array.emptyCharArray
     //var holdLength = 0
 
-    for( i <- 0 until words.length by 1 )
+    var run = true
+    if( words.contains(word) )
     {
-      var run = true
-      if( words(i).equals(word) )
+      //for( i <- 0 until chars.length by 1 )
+      var j = 0
+      while( run )
       {
-        //for( i <- 0 until chars.length by 1 )
-        var j = 0
-        while( run )
+        var charsHold = chars.clone()
+        charsHold(j) = ' '
+        val tempWord = charsHold.mkString.replaceAll("\\s", "")
+        if( words.contains(tempWord) )
         {
-          var charsHold = chars.clone()
-          charsHold(j) = ' '
-          val tempWord = charsHold.mkString.replaceAll("\\s", "")
-          for( k <- 0 until words.length by 1 )
-          {
-            if( words(k).equals(tempWord) )
-            {
-              depth = depth + funnel(tempWord)
-              run = false
-            }
-          }
-
-          if( j >= chars.length-1 ){ run = false }
-          else
-          {
-            j = j + 1
-          }
+          depth = depth + funnel(tempWord)
+          wordExclusion += tempWord
+          run = false
         }
+
+        if( j >= chars.length-1 ){ run = false }
+        else{ j = j + 1 }
       }
     }
 
     return depth
   }
 
-  println( funnel("princesses") )
+  def start( word :String ) :Int =
+  {
+    var largest = 0
+    for( i <- 0 until word.length by 1 )
+    {
+      val depth = funnel(word)
+
+      if( depth > largest )
+      {
+        largest = depth
+      }
+    }
+
+    return largest
+  }
+
+  println( start("princesses") )
 }
