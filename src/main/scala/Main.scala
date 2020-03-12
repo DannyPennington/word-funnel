@@ -3,36 +3,47 @@ import scala.io.Source
 
 object Main extends App
 {
+  val function :Function = new Function()
+
+  println( function.start("gnash") )
+  println( function.start("princesses") )
+  println( function.start("turntables") )
+  println( function.start("implosive") )
+  println( function.start("programmer") )
+
+  //println( start("implosive") )
+  //println( funnel("implosive", true) )
+}
+
+
+class Function()
+{
+  val words :Array[String] = readFile()
+  var wordExclusion :ArrayBuffer[String] = ArrayBuffer.empty[String]
 
   def readFile(): Array[String] =
   {
     Source.fromFile("/home/qa-admin/Downloads/dictionary.txt").getLines.toArray
   }
 
-  val words = readFile()
-  val wordExclusion = ArrayBuffer.empty[String]
-
-  def funnel( word :String, index :Int=0 ) :Int =
+  def funnel( word :String, exclusion :Boolean) :Int =
   {
     val chars = word.toCharArray
     var depth = 1
-    //var charsHold :Array[Char] = Array.emptyCharArray
-    //var holdLength = 0
 
     var run = true
     if( words.contains(word) )
     {
-      //for( i <- 0 until chars.length by 1 )
       var j = 0
       while( run )
       {
         var charsHold = chars.clone()
         charsHold(j) = ' '
         val tempWord = charsHold.mkString.replaceAll("\\s", "")
-        if( words.contains(tempWord) )
+        if( words.contains(tempWord) && !wordExclusion.contains(tempWord) )
         {
-          depth = depth + funnel(tempWord)
-          wordExclusion += tempWord
+          depth = depth + funnel(tempWord, exclusion)
+          if( exclusion ){ wordExclusion += tempWord }
           run = false
         }
 
@@ -41,24 +52,31 @@ object Main extends App
       }
     }
 
-    return depth
+    depth
   }
 
   def start( word :String ) :Int =
   {
+    funnel(word, true)
     var largest = 0
-    for( i <- 0 until word.length by 1 )
+    var depth = 0
+    wordExclusion = ArrayBuffer.empty[String]
+
+    depth = funnel(word, true)
+    for( i <- 0 until wordExclusion.length by 1 )
     {
-      val depth = funnel(word)
+      depth = funnel( wordExclusion(i), false ) + i+1
 
       if( depth > largest )
       {
         largest = depth
       }
     }
+    if( depth > largest )
+    {
+      largest = depth
+    }
 
     return largest
   }
-
-  println( start("princesses") )
 }
