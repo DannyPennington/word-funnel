@@ -10,77 +10,39 @@ object Main extends App
 
   val words = readFile()
 
-  def funnel(word: String): Int =
-  {
-    val chars = word.toCharArray
-    var charsHold :Array[Char] = Array.emptyCharArray
-    var holdLength = 0
-    //var holdWord = ""
-
-    for (i <- 0 until chars.length by 1)
-    {
-      charsHold = chars.clone()
-      charsHold(i) = ' '
-      val tempWord = charsHold.mkString.replaceAll("\\s", "")
-      var length = 0
-      var count = 0
-      var found = true
-      while( found && !(count >= words.length) )
-      {
-        if (words(count).equals(tempWord) )
-        {
-          length = words(count).length
-          //holdWord = tempWord
-
-          found = false
-        }
-        count = count +1
-      }
-      if( length > holdLength)
-      {
-        holdLength = length
-      }
-    }
-
-    return holdLength
-  }
-
-  def funnel2( word :String ) :Int =
-  {
-    var end = true
-    var word2 = word
-
-    while( end )
-    {
-      var length = funnel(word2)
-      var longestLength = funnel(word2)
-
-      if (length > longestLength)
-      {
-        longestLength = length
-      }
-    }
-
-    return 0
-  }
-
-  def funnel3( word :String, index :Int=0 ) :Int =
+  def funnel( word :String, index :Int=0 ) :Int =
   {
     val chars = word.toCharArray
     var depth = 1
     //var charsHold :Array[Char] = Array.emptyCharArray
     //var holdLength = 0
 
-    if( words.contains(word) )
+    for( i <- 0 until words.length by 1 )
     {
-      for (i <- 0 until chars.length by 1)
+      var run = true
+      if( words(i).equals(word) )
       {
-        var charsHold = chars.clone()
-        charsHold(i) = ' '
-        val tempWord = charsHold.mkString.replaceAll("\\s", "")
-        if( words.contains(tempWord) )
+        //for( i <- 0 until chars.length by 1 )
+        var j = 0
+        while( run )
         {
-          depth = depth + funnel3(tempWord)
+          var charsHold = chars.clone()
+          charsHold(j) = ' '
+          val tempWord = charsHold.mkString.replaceAll("\\s", "")
+          for( k <- 0 until words.length by 1 )
+          {
+            if( words(k).equals(tempWord) )
+            {
+              depth = depth + funnel(tempWord)
+              run = false
+            }
+          }
+
+          if( j >= chars.length-1 ){ run = false }
+          else
+          {
+            j = j + 1
+          }
         }
       }
     }
@@ -88,8 +50,5 @@ object Main extends App
     return depth
   }
 
-  //println( funnel("gnash") )
-  //println( funnel2("turntables") )
-  println( funnel3("gnash") )
-  //println( "gnash".slice(1, 60) )
+  println( funnel("princesses") )
 }
